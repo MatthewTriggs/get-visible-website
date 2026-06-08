@@ -49,6 +49,37 @@
 
   h1, h2, h3, h4 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
 
+  /* ── CUSTOM CURSOR (non-touch only) ── */
+  @media (pointer: fine) {
+    * { cursor: none !important; }
+  }
+  .cursor-dot, .cursor-ring {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    top: 0; left: 0;
+  }
+  .cursor-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    transition: transform 0.1s ease, opacity 0.3s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid rgba(29,158,117,0.6);
+    transition: width 0.35s cubic-bezier(0.16,1,0.3,1),
+                height 0.35s cubic-bezier(0.16,1,0.3,1),
+                border-color 0.35s,
+                opacity 0.3s;
+  }
+  .cursor-ring.expand {
+    width: 56px; height: 56px;
+    border-color: var(--green);
+  }
+  .cursor-dot.clicking { transform: translate(-50%,-50%) scale(0.5); }
+
   /* ── SCROLLBAR ── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--black); }
@@ -59,14 +90,17 @@
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
     padding: 20px 5%;
-    transition: background 0.3s, padding 0.3s, backdrop-filter 0.3s;
+    transition: background 0.3s, padding 0.3s, backdrop-filter 0.3s,
+                transform 0.45s cubic-bezier(0.16,1,0.3,1);
   }
   nav.scrolled {
-    background: rgba(10,10,10,0.9);
-    backdrop-filter: blur(16px);
+    background: rgba(10,10,10,0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     padding: 14px 5%;
     border-bottom: 1px solid var(--border);
   }
+  nav.nav-hidden { transform: translateY(-110%); }
   .nav-logo {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 2rem;
@@ -95,15 +129,15 @@
     border: none; border-radius: 4px;
     text-decoration: none;
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    transition: background 0.2s, box-shadow 0.2s;
     white-space: nowrap;
+    position: relative;
+    will-change: transform;
   }
   .btn:hover {
     background: var(--green-light);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(29,158,117,0.35);
+    box-shadow: 0 8px 28px rgba(29,158,117,0.4);
   }
-  .btn:active { transform: translateY(0); }
   .btn-outline {
     background: transparent;
     border: 1.5px solid var(--green);
@@ -128,17 +162,19 @@
     overflow: hidden;
   }
   .hero-bg {
-    position: absolute; inset: 0; z-index: 0;
+    position: absolute; inset: -10%; z-index: 0;
     background:
       radial-gradient(ellipse 80% 60% at 70% 40%, rgba(29,158,117,0.12) 0%, transparent 60%),
       radial-gradient(ellipse 50% 50% at 20% 80%, rgba(29,158,117,0.06) 0%, transparent 50%);
+    will-change: transform;
   }
   .hero-grid {
-    position: absolute; inset: 0; z-index: 0; opacity: 0.04;
+    position: absolute; inset: -10%; z-index: 0; opacity: 0.04;
     background-image:
       linear-gradient(var(--cream) 1px, transparent 1px),
       linear-gradient(90deg, var(--cream) 1px, transparent 1px);
     background-size: 60px 60px;
+    will-change: transform;
   }
   .hero-content { position: relative; z-index: 1; max-width: 800px; }
   .hero-tag {
@@ -153,7 +189,11 @@
     margin-bottom: 28px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
   }
+  .hero-tag.visible { opacity: 1; transform: translateY(0); }
   .hero-tag::before {
     content: '';
     width: 6px; height: 6px;
@@ -165,6 +205,8 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.4); }
   }
+
+  /* ── HERO WORD ANIMATION ── */
   .hero-h1 {
     font-size: clamp(4rem, 12vw, 10rem);
     line-height: 0.9;
@@ -176,14 +218,39 @@
     color: var(--green);
     display: block;
   }
+  .word-wrap {
+    display: block;
+    overflow: hidden;
+    line-height: 1;
+    padding-bottom: 0.05em;
+  }
+  .hero-h1 em .word-wrap { display: block; }
+  .hero-word {
+    display: block;
+    transform: translateY(110%);
+    opacity: 0;
+    transition: transform 0.9s cubic-bezier(0.16,1,0.3,1), opacity 0.7s ease;
+  }
+  .hero-word.visible { transform: translateY(0); opacity: 1; }
+
   .hero-sub {
     font-size: clamp(1rem, 2vw, 1.2rem);
     color: var(--cream-dim);
     max-width: 520px;
     margin-bottom: 44px;
     line-height: 1.7;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
   }
-  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .hero-sub.visible { opacity: 1; transform: translateY(0); }
+  .hero-actions {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .hero-actions.visible { opacity: 1; transform: translateY(0); }
   .hero-scroll {
     position: absolute; bottom: 40px; left: 5%;
     display: flex; align-items: center; gap: 12px;
@@ -240,6 +307,25 @@
     font-size: 1.05rem; color: var(--cream-dim); max-width: 560px; line-height: 1.7;
   }
 
+  /* ── SCROLL REVEAL ANIMATIONS ── */
+  .fade-up {
+    opacity: 0; transform: translateY(48px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  .reveal-left {
+    opacity: 0; transform: translateX(-56px);
+    transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+  .reveal-right {
+    opacity: 0; transform: translateX(56px);
+    transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
   /* ── STATS ── */
   #stats {
     padding: 0;
@@ -269,10 +355,224 @@
     line-height: 1.4;
   }
 
-  /* ── HOW IT WORKS ── */
-  #how {
+  /* ── BEFORE / AFTER SLIDER ── */
+  #proof {
     background: var(--card-bg);
   }
+  .proof-header { margin-bottom: 64px; }
+  .ba-container { max-width: 960px; }
+  .ba-slider {
+    position: relative;
+    height: clamp(360px, 50vw, 500px);
+    border-radius: 12px;
+    overflow: hidden;
+    user-select: none;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px var(--border);
+    touch-action: pan-y;
+  }
+  .ba-before, .ba-after {
+    position: absolute;
+    inset: 0;
+  }
+  .ba-before { z-index: 1; background: #f1f3f4; }
+  .ba-after {
+    z-index: 2;
+    background: var(--black);
+    clip-path: inset(0 50% 0 0);
+    transition: clip-path 0s;
+  }
+
+  /* Before mockup */
+  .ba-mockup { width: 100%; height: 100%; }
+  .ba-mockup-before {
+    display: flex; flex-direction: column;
+    background: #f1f3f4;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .bmb-searchbar {
+    background: white;
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+  }
+  .bmb-searchbar svg { flex-shrink: 0; }
+  .bmb-searchinput {
+    background: #f1f3f4;
+    border-radius: 22px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    color: #3c4043;
+    flex: 1;
+  }
+  .bmb-body {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 16px 24px;
+  }
+  .bmb-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px 22px;
+    width: 100%; max-width: 340px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+  }
+  .bmb-name { font-size: 1.05rem; font-weight: 700; color: #202124; margin-bottom: 4px; }
+  .bmb-stars { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .bmb-starval { color: #f4a400; font-size: 0.85rem; letter-spacing: 1px; }
+  .bmb-reviewcount { font-size: 0.78rem; color: #70757a; }
+  .bmb-cat { font-size: 0.8rem; color: #70757a; margin-bottom: 12px; }
+  .bmb-divider { border: none; border-top: 1px solid #e8eaed; margin-bottom: 12px; }
+  .bmb-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; font-size: 0.8rem; color: #3c4043; }
+  .bmb-row svg { flex-shrink: 0; margin-top: 1px; }
+  .bmb-nowebsite {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.78rem; color: #9aa0a6;
+    font-style: italic;
+    margin-bottom: 14px;
+    padding: 6px 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #dadce0;
+  }
+  .bmb-actions { display: flex; gap: 8px; }
+  .bmb-action {
+    flex: 1; text-align: center;
+    padding: 7px 4px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-size: 0.75rem; font-weight: 600;
+    color: #1a73e8;
+    background: white;
+  }
+
+  /* After mockup */
+  .ba-mockup-after {
+    height: 100%;
+    display: flex; flex-direction: column;
+    background: var(--black);
+    position: relative;
+    overflow: hidden;
+  }
+  .bma-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 70% at 60% 40%, rgba(29,158,117,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .bma-nav {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,10,0.8);
+    backdrop-filter: blur(12px);
+    flex-shrink: 0;
+  }
+  .bma-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem; letter-spacing: 0.04em;
+    color: var(--cream);
+  }
+  .bma-logo span { color: var(--green); }
+  .bma-pill {
+    background: var(--green);
+    color: white;
+    font-size: 0.7rem; font-weight: 600;
+    padding: 5px 12px; border-radius: 100px;
+    white-space: nowrap;
+  }
+  .bma-hero {
+    position: relative; z-index: 1;
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: 20px 28px;
+  }
+  .bma-tag {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 10px;
+  }
+  .bma-h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    line-height: 0.95;
+    color: var(--cream);
+    margin-bottom: 10px;
+    letter-spacing: 0.02em;
+  }
+  .bma-h1 span { color: var(--green); }
+  .bma-sub {
+    font-size: 0.75rem; color: var(--cream-dim); line-height: 1.5;
+    max-width: 300px; margin-bottom: 18px;
+  }
+  .bma-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green);
+    color: white;
+    font-size: 0.75rem; font-weight: 700;
+    padding: 9px 18px; border-radius: 4px;
+    width: fit-content;
+  }
+  .bma-stats {
+    position: relative; z-index: 1;
+    display: flex;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .bma-stat {
+    flex: 1; text-align: center; padding: 10px 8px;
+    border-right: 1px solid var(--border);
+  }
+  .bma-stat:last-child { border-right: none; }
+  .bma-statnum {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem; color: var(--green); line-height: 1;
+  }
+  .bma-statlabel { font-size: 0.6rem; color: var(--cream-dim); margin-top: 2px; }
+
+  /* Slider handle */
+  .ba-handle {
+    position: absolute; top: 0; bottom: 0; left: 50%;
+    z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+    cursor: ew-resize;
+    transform: translateX(-50%);
+  }
+  .ba-handle-line { flex: 1; width: 2px; background: white; opacity: 0.7; }
+  .ba-handle-icon {
+    width: 44px; height: 44px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .ba-handle:hover .ba-handle-icon { transform: scale(1.1); }
+  .ba-label {
+    position: absolute; bottom: 20px; z-index: 10;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(8px);
+    color: white;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 100px;
+    pointer-events: none;
+  }
+  .ba-label-before { left: 20px; }
+  .ba-label-after { right: 20px; }
+  .ba-hint {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: var(--cream-dim);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .ba-hint::before, .ba-hint::after {
+    content: '←';
+    color: var(--green);
+  }
+  .ba-hint::after { content: '→'; }
+
+  /* ── HOW IT WORKS ── */
+  #how { background: var(--card-bg); }
   .how-header { margin-bottom: 72px; }
   .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
   .steps::before {
@@ -315,20 +615,30 @@
     border-radius: 8px;
     padding: 40px 36px;
     position: relative;
-    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    transition: border-color 0.35s, transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s;
     opacity: 0; transform: translateY(40px);
   }
   .pricing-card.visible { opacity: 1; transform: translateY(0); }
   .pricing-card:hover {
-    border-color: rgba(29,158,117,0.4);
-    transform: translateY(-6px);
-    box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+    border-color: rgba(29,158,117,0.5);
+    transform: translateY(-8px) !important;
+    box-shadow: 0 28px 56px rgba(0,0,0,0.45), 0 0 48px rgba(29,158,117,0.1);
   }
   .pricing-card.featured {
     border-color: var(--green);
     background: linear-gradient(160deg, #111 0%, #0d1f1a 100%);
   }
-  .pricing-card.featured:hover { transform: translateY(-8px); }
+  .pricing-card.featured::after {
+    content: '';
+    position: absolute; inset: -1px;
+    border-radius: 8px;
+    z-index: -1;
+    animation: featuredGlow 3s ease-in-out infinite;
+  }
+  @keyframes featuredGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(29,158,117,0); }
+    50%       { box-shadow: 0 0 48px rgba(29,158,117,0.22); }
+  }
   .popular-badge {
     position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
     background: var(--green); color: #fff;
@@ -368,9 +678,7 @@
     display: flex; align-items: center; justify-content: space-between; gap: 32px;
     max-width: 1000px;
   }
-  .pricing-footer h3 {
-    font-size: 2rem; color: var(--cream); margin-bottom: 8px;
-  }
+  .pricing-footer h3 { font-size: 2rem; color: var(--cream); margin-bottom: 8px; }
   .pricing-footer p { font-size: 0.9rem; color: var(--cream-dim); max-width: 400px; }
   .retainer-price {
     font-family: 'Bebas Neue', sans-serif;
@@ -435,13 +743,6 @@
     flex-wrap: wrap;
   }
 
-  /* ── ANIMATIONS ── */
-  .fade-up {
-    opacity: 0; transform: translateY(40px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  .fade-up.visible { opacity: 1; transform: translateY(0); }
-
   /* ── MOBILE ── */
   @media (max-width: 960px) {
     .stats-inner { grid-template-columns: repeat(2, 1fr); }
@@ -453,6 +754,7 @@
     .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
     .pricing-footer { flex-direction: column; text-align: center; }
     .footer-top { grid-template-columns: 1fr 1fr; }
+    .ba-container { max-width: 100%; }
   }
 
   @media (max-width: 700px) {
@@ -466,6 +768,9 @@
     .footer-top { grid-template-columns: 1fr; }
     .footer-bottom { flex-direction: column; text-align: center; }
     .pricing-grid { margin: 0 auto; }
+    .ba-slider { height: 300px; }
+    .reveal-left, .reveal-right { transform: translateY(40px); }
+    .reveal-left.visible, .reveal-right.visible { transform: translateY(0); }
   }
 </style>
 </head>
@@ -487,13 +792,13 @@
 
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-grid" id="heroGrid"></div>
   <div class="hero-content">
-    <div class="hero-tag">Web design for SA small businesses</div>
-    <h1 class="hero-h1">Get <em>Visible</em> Online</h1>
-    <p class="hero-sub">South African small businesses deserve a powerful online presence. We build fast, beautiful websites that attract customers. Affordably, in 48 hours.</p>
-    <div class="hero-actions">
+    <div class="hero-tag" id="heroTag">Web design for SA small businesses</div>
+    <h1 class="hero-h1" id="heroH1">Get <em>Visible</em> Online</h1>
+    <p class="hero-sub" id="heroSub">South African small businesses deserve a powerful online presence. We build fast, beautiful websites that attract customers. Affordably, in 48 hours.</p>
+    <div class="hero-actions" id="heroActions">
       <a href="https://wa.me/27825669681?text=Hi%2C%20I'd%20like%20a%20free%20demo!" class="btn" target="_blank" rel="noopener">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.103 1.508 5.832L0 24l6.335-1.652C8.011 23.406 9.966 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.846 0-3.574-.497-5.061-1.367l-.363-.215-3.762.982.999-3.671-.237-.377A9.787 9.787 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
         Get a free demo
@@ -513,27 +818,120 @@
 <section id="stats">
   <div class="stats-inner">
     <div class="stat-item fade-up">
-      <div class="stat-num">72%</div>
+      <div class="stat-num" data-target="72" data-suffix="%">72%</div>
       <div class="stat-label">of SA small businesses have no website</div>
     </div>
     <div class="stat-item fade-up">
-      <div class="stat-num">R3,500</div>
+      <div class="stat-num" data-target="3500" data-prefix="R" data-comma="1">R3,500</div>
       <div class="stat-label">websites starting from</div>
     </div>
     <div class="stat-item fade-up">
-      <div class="stat-num">48hr</div>
+      <div class="stat-num" data-target="48" data-suffix="hr">48hr</div>
       <div class="stat-label">demo ready in 48 hours</div>
     </div>
     <div class="stat-item fade-up">
-      <div class="stat-num">R20</div>
+      <div class="stat-num" data-target="20" data-prefix="R">R20</div>
       <div class="stat-label">per day, less than a loaf of bread</div>
     </div>
   </div>
 </section>
 
+<!-- BEFORE / AFTER -->
+<section id="proof">
+  <div class="proof-header reveal-right">
+    <span class="section-label">The Difference</span>
+    <h2 class="section-h2">Invisible vs.<br>Unstoppable.</h2>
+    <p class="section-sub">Here's what your customers find right now — and what they'll find after Get Visible. Drag to compare.</p>
+  </div>
+
+  <div class="ba-container fade-up">
+    <div class="ba-slider" id="baSlider">
+
+      <!-- BEFORE panel -->
+      <div class="ba-before">
+        <div class="ba-mockup ba-mockup-before">
+          <div class="bmb-searchbar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#9aa0a6"><path d="M15.5 14h-.79l-.28-.27A6.5 6.5 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <div class="bmb-searchinput">sipho's electrical services pretoria</div>
+          </div>
+          <div class="bmb-body">
+            <div class="bmb-card">
+              <div class="bmb-name">Sipho's Electrical Services</div>
+              <div class="bmb-stars">
+                <span class="bmb-starval">★★★★☆</span>
+                <span class="bmb-reviewcount">4.2 · 23 reviews</span>
+              </div>
+              <div class="bmb-cat">Electrician · Centurion, Pretoria · Open</div>
+              <hr class="bmb-divider">
+              <div class="bmb-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#70757a"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span>12 Jacaranda Ave, Centurion</span>
+              </div>
+              <div class="bmb-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#70757a"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                <span>+27 82 000 0000</span>
+              </div>
+              <div class="bmb-nowebsite">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#9aa0a6"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+                No website listed
+              </div>
+              <div class="bmb-actions">
+                <div class="bmb-action">Directions</div>
+                <div class="bmb-action">Call</div>
+                <div class="bmb-action">Share</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ba-label ba-label-before">Before: No website</div>
+      </div>
+
+      <!-- AFTER panel -->
+      <div class="ba-after" id="baAfter">
+        <div class="ba-mockup ba-mockup-after">
+          <div class="bma-bg"></div>
+          <div class="bma-nav">
+            <span class="bma-logo">Sipho's Electrical<span>.</span></span>
+            <span class="bma-pill">WhatsApp Us</span>
+          </div>
+          <div class="bma-hero">
+            <div class="bma-tag">⚡ Certified Electrician · Pretoria</div>
+            <div class="bma-h1">FAST.<br><span>RELIABLE.</span><br>TRUSTED.</div>
+            <div class="bma-sub">Professional electrical services for homes and businesses. Free quotes. Available 7 days a week.</div>
+            <div class="bma-cta">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.103 1.508 5.832L0 24l6.335-1.652C8.011 23.406 9.966 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.846 0-3.574-.497-5.061-1.367l-.363-.215-3.762.982.999-3.671-.237-.377A9.787 9.787 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+              Get a Free Quote
+            </div>
+          </div>
+          <div class="bma-stats">
+            <div class="bma-stat"><div class="bma-statnum">200+</div><div class="bma-statlabel">Jobs Done</div></div>
+            <div class="bma-stat"><div class="bma-statnum">5yr</div><div class="bma-statlabel">Experience</div></div>
+            <div class="bma-stat"><div class="bma-statnum">4.9★</div><div class="bma-statlabel">Rating</div></div>
+          </div>
+        </div>
+        <div class="ba-label ba-label-after">After: Get Visible</div>
+      </div>
+
+      <!-- HANDLE -->
+      <div class="ba-handle" id="baHandle">
+        <div class="ba-handle-line"></div>
+        <div class="ba-handle-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M7 4L1 10L7 16" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13 4L19 10L13 16" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="ba-handle-line"></div>
+      </div>
+
+    </div>
+    <div class="ba-hint">Drag to compare</div>
+  </div>
+</section>
+
 <!-- HOW IT WORKS -->
 <section id="how">
-  <div class="how-header fade-up">
+  <div class="how-header reveal-left">
     <span class="section-label">The Process</span>
     <h2 class="section-h2">Up and running<br>in a week</h2>
     <p class="section-sub">No jargon. No long waits. We handle everything from first contact to going live. You just approve and launch.</p>
@@ -564,7 +962,7 @@
 
 <!-- PRICING -->
 <section id="pricing">
-  <div class="pricing-header fade-up">
+  <div class="pricing-header reveal-right">
     <span class="section-label">Pricing</span>
     <h2 class="section-h2">Transparent.<br>No surprises.</h2>
     <p class="section-sub">One-time build fee. That's it. No hidden charges, no setup fees, no nonsense.</p>
@@ -627,7 +1025,7 @@
 
   </div>
 
-  <div class="pricing-footer fade-up">
+  <div class="pricing-footer reveal-left">
     <div>
       <h3>Monthly Care Plan</h3>
       <p>Keep your website fast, secure and up-to-date. Includes hosting, backups, content updates, and WhatsApp support.</p>
@@ -695,11 +1093,61 @@
 </footer>
 
 <script>
-  // ── NAV SCROLL ──
+  // ── TOUCH DETECTION ──
+  const isTouch = window.matchMedia('(pointer: coarse)').matches;
+
+  // ── CUSTOM CURSOR ──
+  if (!isTouch) {
+    const dot  = document.createElement('div'); dot.className  = 'cursor-dot';
+    const ring = document.createElement('div'); ring.className = 'cursor-ring';
+    document.body.append(dot, ring);
+
+    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      dot.style.left = mouseX + 'px';
+      dot.style.top  = mouseY + 'px';
+    });
+
+    document.addEventListener('mousedown', () => dot.classList.add('clicking'));
+    document.addEventListener('mouseup',   () => dot.classList.remove('clicking'));
+
+    (function animateRing() {
+      ringX += (mouseX - ringX) * 0.1;
+      ringY += (mouseY - ringY) * 0.1;
+      ring.style.left = ringX + 'px';
+      ring.style.top  = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    })();
+
+    document.querySelectorAll('a, button, .btn, .ba-slider, .pricing-card, .step').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('expand'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
+    });
+  }
+
+  // ── NAV SCROLL + HIDE/SHOW ──
   const navbar = document.getElementById('navbar');
+  let lastScrollY = 0;
   window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 40);
-  });
+    const y = window.scrollY;
+    navbar.classList.toggle('scrolled', y > 40);
+    if (y < 80) {
+      navbar.classList.remove('nav-hidden');
+    } else if (y > lastScrollY + 8) {
+      navbar.classList.add('nav-hidden');
+    } else if (y < lastScrollY - 8) {
+      navbar.classList.remove('nav-hidden');
+    }
+    lastScrollY = y;
+
+    // Parallax hero
+    if (y < window.innerHeight * 1.2) {
+      document.getElementById('heroBg').style.transform   = `translateY(${y * 0.35}px)`;
+      document.getElementById('heroGrid').style.transform = `translateY(${y * 0.18}px)`;
+    }
+  }, { passive: true });
 
   // ── HAMBURGER ──
   function toggleMenu() {
@@ -711,7 +1159,44 @@
     document.getElementById('navLinks').classList.remove('open');
   }));
 
-  // ── MARQUEE BUILD ──
+  // ── SMOOTH SCROLL ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      const top = target.getBoundingClientRect().top + window.scrollY - 72;
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
+
+  // ── HERO WORD ANIMATION ──
+  (function initHero() {
+    const h1 = document.getElementById('heroH1');
+    h1.innerHTML =
+      '<span class="word-wrap"><span class="hero-word" id="hw0">Get</span></span>' +
+      '<em><span class="word-wrap"><span class="hero-word" id="hw1">Visible</span></span></em>' +
+      '<span class="word-wrap"><span class="hero-word" id="hw2">Online</span></span>';
+
+    const tag     = document.getElementById('heroTag');
+    const sub     = document.getElementById('heroSub');
+    const actions = document.getElementById('heroActions');
+
+    const stagger = [
+      [tag,                             80],
+      [document.getElementById('hw0'), 200],
+      [document.getElementById('hw1'), 360],
+      [document.getElementById('hw2'), 500],
+      [sub,                            680],
+      [actions,                        820],
+    ];
+
+    stagger.forEach(([el, delay]) => {
+      setTimeout(() => el.classList.add('visible'), delay);
+    });
+  })();
+
+  // ── MARQUEE ──
   const businesses = [
     'Salons','Mechanics','Restaurants','Butcheries','Hardware Stores',
     'Takeaways','Contractors','Clinics','Spaza Shops','Plumbers',
@@ -719,24 +1204,98 @@
     'Tailors','Caterers','Barbers','Nurseries','Estate Agents'
   ];
   const track = document.getElementById('marqueeTrack');
-  const doubled = [...businesses, ...businesses];
-  doubled.forEach(b => {
+  [...businesses, ...businesses].forEach(b => {
     const item = document.createElement('div');
     item.className = 'marquee-item';
     item.innerHTML = `<span class="marquee-dot"></span>${b}`;
     track.appendChild(item);
   });
 
-  // ── INTERSECTION OBSERVER ──
-  const observer = new IntersectionObserver((entries) => {
+  // ── SCROLL REVEAL OBSERVER ──
+  const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
       }
     });
   }, { threshold: 0.12 });
 
-  document.querySelectorAll('.fade-up, .step, .pricing-card').forEach(el => observer.observe(el));
+  document.querySelectorAll('.fade-up, .reveal-left, .reveal-right, .step, .pricing-card').forEach(el => {
+    revealObserver.observe(el);
+  });
+
+  // ── NUMBER COUNTERS ──
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target  = parseInt(el.dataset.target);
+      const prefix  = el.dataset.prefix  || '';
+      const suffix  = el.dataset.suffix  || '';
+      const useComma = el.dataset.comma === '1';
+      const duration = 1800;
+      const start = performance.now();
+
+      function update(now) {
+        const elapsed  = Math.min(now - start, duration);
+        const progress = elapsed / duration;
+        const eased    = 1 - Math.pow(1 - progress, 4);
+        const current  = Math.round(eased * target);
+        const display  = useComma ? current.toLocaleString('en-ZA') : current;
+        el.textContent = prefix + display + suffix;
+        if (elapsed < duration) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+      counterObserver.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.stat-num[data-target]').forEach(el => counterObserver.observe(el));
+
+  // ── MAGNETIC BUTTONS ──
+  if (!isTouch) {
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('mousemove', e => {
+        const r  = btn.getBoundingClientRect();
+        const dx = (e.clientX - r.left - r.width  / 2) * 0.32;
+        const dy = (e.clientY - r.top  - r.height / 2) * 0.32;
+        btn.style.transform = `translate(${dx}px, ${dy}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transition = 'transform 0.7s cubic-bezier(0.16,1,0.3,1), background 0.2s, box-shadow 0.2s';
+        btn.style.transform  = '';
+        setTimeout(() => { btn.style.transition = ''; }, 700);
+      });
+    });
+  }
+
+  // ── BEFORE / AFTER SLIDER ──
+  (function initSlider() {
+    const slider   = document.getElementById('baSlider');
+    const after    = document.getElementById('baAfter');
+    const handle   = document.getElementById('baHandle');
+    let dragging   = false;
+    let pct        = 50;
+
+    function setPosition(x) {
+      const r = slider.getBoundingClientRect();
+      pct = Math.min(Math.max(((x - r.left) / r.width) * 100, 2), 98);
+      handle.style.left       = pct + '%';
+      after.style.clipPath    = `inset(0 ${100 - pct}% 0 0)`;
+      after.style.transition  = 'none';
+    }
+
+    setPosition(slider.getBoundingClientRect().left + slider.getBoundingClientRect().width * 0.5);
+
+    slider.addEventListener('mousedown',  e => { dragging = true; setPosition(e.clientX); });
+    document.addEventListener('mouseup',  () => { dragging = false; });
+    document.addEventListener('mousemove',e => { if (dragging) setPosition(e.clientX); });
+
+    slider.addEventListener('touchstart', e => { dragging = true; setPosition(e.touches[0].clientX); }, { passive: true });
+    document.addEventListener('touchend', () => { dragging = false; });
+    document.addEventListener('touchmove',e => { if (dragging) setPosition(e.touches[0].clientX); }, { passive: true });
+  })();
 
   // ── STEP STAGGER ──
   document.querySelectorAll('.step').forEach((step, i) => {
