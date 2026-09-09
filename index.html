@@ -586,6 +586,7 @@
   .pricing-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1000px;
   }
+  .pricing-grid.website-pricing-grid { grid-template-columns: repeat(4, 1fr); max-width: 1280px; }
   .pricing-card {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -738,6 +739,10 @@
     flex-wrap: wrap;
   }
 
+  @media (max-width: 1100px) {
+    .pricing-grid.website-pricing-grid { grid-template-columns: repeat(2, 1fr); max-width: 640px; }
+  }
+
   /* ── MOBILE ── */
   @media (max-width: 960px) {
     .stats-inner { grid-template-columns: repeat(2, 1fr); }
@@ -747,6 +752,7 @@
     .steps { grid-template-columns: 1fr 1fr; gap: 48px; }
     .steps::before { display: none; }
     .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
+    .pricing-grid.website-pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
     .content-gallery { columns: 2 200px; }
     .footer-top { grid-template-columns: 1fr 1fr; }
     .ba-container { max-width: 100%; }
@@ -974,7 +980,7 @@
     <p class="section-sub">One-time build fee. That's it. No hidden charges, no setup fees, no nonsense.</p>
   </div>
 
-  <div class="pricing-grid">
+  <div class="pricing-grid website-pricing-grid">
 
     <div class="pricing-card fade-up">
       <div class="pkg-name">Starter</div>
@@ -986,7 +992,6 @@
         <li>WhatsApp contact button</li>
         <li>Google Maps integration</li>
         <li>Basic SEO setup</li>
-        <li>Free domain for 1 year</li>
       </ul>
       <a href="https://wa.me/27825669681?text=Hi%2C%20I'm%20interested%20in%20the%20Starter%20package" class="btn btn-outline" style="width:100%;justify-content:center;" target="_blank" rel="noopener">Get started</a>
     </div>
@@ -1002,7 +1007,6 @@
         <li>WhatsApp contact button</li>
         <li>Google Maps integration</li>
         <li>Full SEO setup</li>
-        <li>Free domain for 1 year</li>
         <li>Photo gallery / portfolio</li>
         <li>Google Business listing</li>
       </ul>
@@ -1019,7 +1023,6 @@
         <li>WhatsApp contact button</li>
         <li>Google Maps integration</li>
         <li>Full SEO setup</li>
-        <li>Free domain for 1 year</li>
         <li>Photo gallery / portfolio</li>
         <li>Google Business listing</li>
         <li>Blog / news section</li>
@@ -1027,6 +1030,23 @@
         <li>Priority support</li>
       </ul>
       <a href="https://wa.me/27825669681?text=Hi%2C%20I'm%20interested%20in%20the%20Premium%20package" class="btn btn-outline" style="width:100%;justify-content:center;" target="_blank" rel="noopener">Get started</a>
+    </div>
+
+    <div class="pricing-card fade-up">
+      <div class="pkg-name">Ecommerce</div>
+      <div class="pkg-price"><span style="font-size:1rem;color:var(--cream-dim);font-family:'DM Sans',sans-serif;font-weight:400;">From </span><sub>R</sub>15,000</div>
+      <div class="pkg-once">once-off</div>
+      <ul class="pkg-features">
+        <li>Online store with product catalog</li>
+        <li>Shopping cart & secure checkout</li>
+        <li>Payment gateway integration</li>
+        <li>Mobile responsive design</li>
+        <li>WhatsApp contact button</li>
+        <li>Full SEO setup</li>
+        <li>Order & inventory management</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="https://wa.me/27825669681?text=Hi%2C%20I'm%20interested%20in%20the%20Ecommerce%20package" class="btn btn-outline" style="width:100%;justify-content:center;" target="_blank" rel="noopener">Get started</a>
     </div>
 
   </div>
@@ -1209,6 +1229,7 @@
         <li><a href="#pricing">Starter Website</a></li>
         <li><a href="#pricing">Standard Website</a></li>
         <li><a href="#pricing">Premium Website</a></li>
+        <li><a href="#pricing">Ecommerce Website</a></li>
         <li><a href="#pricing">Monthly Care Plan</a></li>
         <li><a href="#content">Content Creatives</a></li>
       </ul>
